@@ -1,10 +1,12 @@
-# Runbook: benchmark en H100 spot
+# Runbook: medición de inferencia
 
-Objetivo: ejecutar baseline y variantes optimizadas en la misma H100 y conservar evidencia suficiente para completar la tabla. La duración estimada es 3–4 horas si la instancia, descargas y modelos arrancan sin incidencias; no es una garantía de tiempo ni precio. No se incluyen datos de cliente en esta corrida pública.
+Este documento se ejecuta sobre los datos del cliente. El repo no contiene cifras porque cada medición es específica del workload.
+
+Objetivo: ejecutar baseline y variantes optimizadas en el mismo hardware controlado por el cliente y conservar evidencia suficiente para su informe privado. La duración de cómputo estimada es 3–4 horas si el entorno, descargas y modelos arrancan sin incidencias; no es una garantía de tiempo ni precio.
 
 ## Antes de alquilar
 
-- Reserva una única H100 de 80 GB y registra variante (SXM/PCIe), proveedor, región, tarifa spot efectiva y hora de consulta. No sustituyas esos datos por una tarifa de ejemplo.
+- Usa preferentemente una única H100 de 80 GB bajo la cuenta/infraestructura controlada por el cliente; registra variante (SXM/PCIe), proveedor, región, tarifa efectiva y hora de consulta. No transfieras datos del cliente a una instancia spot de terceros.
 - Comprueba Linux, Docker Compose, NVIDIA Container Toolkit, almacenamiento suficiente para las imágenes y pesos, y salida de red a Hugging Face.
 - Acepta las condiciones de acceso a `meta-llama/Meta-Llama-3.1-8B-Instruct`. Mantén `HF_TOKEN` como variable de entorno/secreto; no lo escribas en archivos versionados ni en logs.
 - Registra el commit evaluado (`git rev-parse HEAD`) y conserva el entorno limpio. Ejecuta las tres configuraciones sin cambiar máquina, modelos ni carga entre ellas.
@@ -23,7 +25,7 @@ make bench
 make report
 ```
 
-`make up` inicia baseline FP16, vLLM 8B FP8, vLLM 3B FP8 y router en la misma GPU. Espera a que los servicios estén healthy antes de iniciar `make bench`. Los tres modelos comparten VRAM; si hay OOM, registra el fallo y detén la corrida. No presentes una tabla parcial como comparación equivalente.
+`make up` inicia baseline FP16, vLLM 8B FP8, vLLM 3B FP8 y router en la misma GPU. Espera a que los servicios estén healthy antes de iniciar `make bench`. Los tres modelos comparten VRAM; si hay OOM, registra el fallo y detén la corrida. No presentes una comparación parcial como equivalente.
 
 El runner ejecuta la evaluación pública GSM8K y la carga configurada a concurrencias 1, 8, 32 y 64. La Capa B privada no se usa en esta prueba. Conserva sin editar `results/results.json` y las gráficas creadas por `make report` antes de apagar la instancia.
 

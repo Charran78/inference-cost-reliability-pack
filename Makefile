@@ -1,6 +1,9 @@
-.PHONY: eval-data validate-intake up down bench report
+.PHONY: test eval-data validate-intake up down bench report
 
 DOMAIN_DATASET ?= private_eval/domain_set.jsonl
+
+test:
+	python -m unittest discover -s tests -v
 
 eval-data:
 	python eval/build_gsm8k_subset.py

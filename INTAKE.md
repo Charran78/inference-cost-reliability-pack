@@ -4,11 +4,13 @@ Este contrato recoge prompts reales del cliente para medir su caso de uso. El se
 
 ## Qué manda el cliente
 
-- 100–150 prompts reales de una ventana de tráfico acordada; objetivo recomendado: 120. No rellenar con ejemplos sintéticos.
-- Un `expected_output` por prompt, revisado por una persona del dominio y respaldado por la fuente de verdad autorizada.
+- 50–100 prompts reales de una ventana de tráfico acordada. No rellenar con ejemplos sintéticos.
+- `expected_output` cuando exista, revisado por una persona del dominio y respaldado por la fuente de verdad autorizada.
 - Solo el contexto mínimo necesario y autorizado; no enviar documentos completos salvo permiso contractual explícito.
 - Una referencia pseudónima `source_ref` que el cliente pueda resolver internamente, sin rutas ni títulos confidenciales.
 - Un `task_type` y un `selection_bucket` de [`SELECTION.md`](SELECTION.md).
+
+El envío inicial puede incluir prompts sin respuesta de referencia. Esos casos no cuentan para delta de calidad hasta que una persona del cliente valide su `expected_output`; no se inventan referencias. El `domain_set.jsonl` final que pasa el validador contiene solo casos listos para puntuar y exige `expected_output`.
 
 Entrega UTF-8 JSONL por el canal seguro acordado en `private_eval/domain_set.jsonl`, una instancia JSON por línea. No enviar la tabla de correspondencia a los prompts originales. No incluir credenciales, secretos, PII ni casos inventados para completar cuotas.
 

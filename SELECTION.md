@@ -1,19 +1,19 @@
 # Selección de la muestra privada
 
-La muestra procede de prompts reales del cliente dentro de una ventana acordada. El sector solo guía etiquetas `task_type`; no es fuente para inventar casos.
+La muestra procede de 50–100 prompts reales del cliente dentro de una ventana acordada. El sector solo guía etiquetas `task_type`; no es fuente para inventar casos. Objetivo recomendado: N=80 casos elegibles; si solo hay 50 válidos, se reportan 50.
 
 ## Regla 60/25/15
 
-Objetivo recomendado: 120 casos únicos, con distribución explícita:
+Distribución de la muestra final, con N entre 50 y 100:
 
 | Bucket (`selection_bucket`) | Cuota | Selección |
 |---|---:|---|
-| `high_volume` | 72 (60%) | Intenciones frecuentes; muestreo dentro del tráfico elegible, ponderado por su frecuencia real. |
-| `boundary_case` | 30 (25%) | Prompts reales de borde: entradas parciales, umbrales, unidades, contexto largo, restricciones en conflicto o ambigüedad que el producto deba resolver. |
-| `current_model_failure` | 18 (15%) | Prompts reales donde la versión actual falla, alucina, omite un requisito o devuelve formato inválido; confirmar el fallo y su criterio esperado antes del benchmark. |
-| **Total** | **120 (100%)** | |
+| `high_volume` | 60% | Intenciones frecuentes; muestreo dentro del tráfico elegible, ponderado por su frecuencia real. |
+| `boundary_case` | 25% | Prompts reales de borde: entradas parciales, umbrales, unidades, contexto largo, restricciones en conflicto o ambigüedad que el producto deba resolver. |
+| `current_model_failure` | 15% | Prompts reales donde la versión actual falla, alucina, omite un requisito o devuelve formato inválido; confirmar el fallo y su criterio esperado antes del benchmark. |
+| **Total** | **100%** | |
 
-Para N entre 100 y 150, escala 60/25/15 con redondeo por restos mayores y registra conteos. No fabriques casos ni fuerces una cuota si no existen casos elegibles: entrega el número real y explica el desvío. Los dos últimos buckets se sobremuestrean deliberadamente; reporta métricas por bucket. La media simple de los 120 no estima la calidad sobre tráfico natural. Para ese estimado, repondera por prevalencia observada en la ventana acordada.
+Para cada N, asigna cuotas 60/25/15 con redondeo por restos mayores; para N=80 son 48/20/12. No fabriques casos ni fuerces una cuota si no existen casos elegibles: entrega el número real y explica el desvío. Los dos últimos buckets se sobremuestrean deliberadamente; reporta métricas por bucket. La media simple no estima la calidad sobre tráfico natural. Para ese estimado, repondera por prevalencia observada en la ventana acordada.
 
 ## Tipos de tarea guía
 
