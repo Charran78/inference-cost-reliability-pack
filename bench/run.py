@@ -211,6 +211,10 @@ async def run_domain_quality(url, model, dataset, max_tokens, concurrency, judge
         "delta_vs_baseline": None,
         "judge_model": judge_model or None,
         "judge_prompt_sha256": hashlib.sha256(judge_prompt.encode("utf-8")).hexdigest(),
+        "status": None,
+        "requested_samples": len(dataset),
+        "by_task_type": {},
+        "samples": [],
     }
     if not dataset:
         return {**metadata, "status": "not_configured"}
@@ -287,6 +291,68 @@ def add_quality_deltas(results):
             quality["domain"]["delta_vs_baseline"] = round(domain_mean - baseline_mean, 3)
 
 
+def create_report_template():
+    load_test = {
+        "concurrency": None,
+        "requests": None,
+        "elapsed_s": None,
+        "output_tokens": None,
+        "throughput_tok_s": None,
+        "ttft_p50_ms": None,
+        "ttft_p95_ms": None,
+        "itl_p50_ms": None,
+        "vram_peak_mb": None,
+        "cost_usd_per_million_tokens": None,
+    }
+    return {
+        "created_at": None,
+        "models": {
+            "baseline_and_fp8": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+            "router_small": "Qwen/Qwen2.5-3B-Instruct",
+        },
+        "benchmark_workload_dataset": None,
+        "benchmark_workload_examples": None,
+        "evaluation": {
+            "gsm8k_dataset": None,
+            "gsm8k_examples": None,
+            "gsm8k_manifest": None,
+            "domain_dataset": None,
+            "domain_examples": None,
+            "judge_model": None,
+            "judge_prompt_sha256": None,
+            "rubric_template_sha256": None,
+        },
+        "hourly_gpu_cost_usd": None,
+        "system": {"platform": None, "python": None, "gpu_name": None},
+        "results": {
+            name: {
+                "load_tests": [{**load_test} for _ in CONCURRENCIES],
+                "quality": {
+                    "gsm8k": {
+                        "accuracy_exact_match": None,
+                        "correct": None,
+                        "n_samples": None,
+                        "samples": [],
+                        "delta_vs_baseline_pp": None,
+                    },
+                    "domain": {
+                        "accuracy_judge_mean": None,
+                        "n_samples": None,
+                        "delta_vs_baseline": None,
+                        "judge_model": None,
+                        "judge_prompt_sha256": None,
+                        "status": None,
+                        "requested_samples": None,
+                        "by_task_type": {},
+                        "samples": [],
+                    },
+                },
+            }
+            for name in CONFIGS
+        },
+    }
+
+
 async def main():
     dataset = load_dataset()
     if not dataset:
@@ -306,57 +372,51 @@ async def main():
     judge_api_key = os.getenv("JUDGE_API_KEY", "")
     judge_prompt = (ROOT / "eval/judge_prompt.txt").read_text()
     rubric_template = json.loads((ROOT / "eval/rubric_template.json").read_text())
-    report = {
+    report = create_report_template()
+    report.update({
         "created_at": datetime.now(timezone.utc).isoformat(),
-        "models": {
-            "baseline_and_fp8": "meta-llama/Meta-Llama-3.1-8B-Instruct",
-            "router_small": "Qwen/Qwen2.5-3B-Instruct",
-        },
         "benchmark_workload_dataset": str(Path(os.getenv("EVAL_DATASET", "eval/subset.jsonl"))),
         "benchmark_workload_examples": len(dataset),
-        "evaluation": {
-            "gsm8k_dataset": str(gsm8k_path),
-            "gsm8k_examples": len(gsm8k_dataset),
-            "gsm8k_manifest": str(gsm8k_path.with_name("gsm8k_200.manifest.json")),
-            "domain_dataset": str(domain_path) if domain_dataset else None,
-            "domain_examples": len(domain_dataset),
-            "judge_model": judge_model or None,
-            "judge_prompt_sha256": hashlib.sha256(judge_prompt.encode("utf-8")).hexdigest(),
-            "rubric_template_sha256": hashlib.sha256(
-                (ROOT / "eval/rubric_template.json").read_bytes()
-            ).hexdigest(),
-        },
         "hourly_gpu_cost_usd": float(os.environ["GPU_HOURLY_USD"]) if os.getenv("GPU_HOURLY_USD") else None,
         "system": {
             "platform": platform.platform(),
             "python": sys.version.split()[0],
             "gpu_name": init_gpu_monitor(),
         },
-        "results": {},
-    }
+    })
+    report["evaluation"].update({
+        "gsm8k_dataset": str(gsm8k_path),
+        "gsm8k_examples": len(gsm8k_dataset),
+        "gsm8k_manifest": str(gsm8k_path.with_name("gsm8k_200.manifest.json")),
+        "domain_dataset": str(domain_path) if domain_dataset else None,
+        "domain_examples": len(domain_dataset),
+        "judge_model": judge_model or None,
+        "judge_prompt_sha256": hashlib.sha256(judge_prompt.encode("utf-8")).hexdigest(),
+        "rubric_template_sha256": hashlib.sha256(
+            (ROOT / "eval/rubric_template.json").read_bytes()
+        ).hexdigest(),
+    })
     for name, config in CONFIGS.items():
         url = config["url"]
         print(f"Benchmarking {name}", flush=True)
-        report["results"][name] = {
-            "load_tests": [],
-            "quality": {
-                "gsm8k": await run_gsm8k_quality(
-                    url, config["model"], gsm8k_dataset, quality_max_tokens, eval_concurrency
-                ),
-                "domain": await run_domain_quality(
-                    url,
-                    config["model"],
-                    domain_dataset,
-                    quality_max_tokens,
-                    eval_concurrency,
-                    judge_base_url,
-                    judge_model,
-                    judge_api_key,
-                    judge_prompt,
-                    rubric_template,
-                ),
-            },
+        report["results"][name]["quality"] = {
+            "gsm8k": await run_gsm8k_quality(
+                url, config["model"], gsm8k_dataset, quality_max_tokens, eval_concurrency
+            ),
+            "domain": await run_domain_quality(
+                url,
+                config["model"],
+                domain_dataset,
+                quality_max_tokens,
+                eval_concurrency,
+                judge_base_url,
+                judge_model,
+                judge_api_key,
+                judge_prompt,
+                rubric_template,
+            ),
         }
+        report["results"][name]["load_tests"] = []
         for concurrency in CONCURRENCIES:
             measurement = await run_load_test(url, config["model"], dataset, concurrency, request_count, max_tokens)
             report["results"][name]["load_tests"].append(measurement)

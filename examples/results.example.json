@@ -1,0 +1,65 @@
+{
+  "_example": true,
+  "_note": "Synthetic schema only; real results are private.",
+  "created_at": null,
+  "models": {
+    "baseline_and_fp8": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+    "router_small": "Qwen/Qwen2.5-3B-Instruct"
+  },
+  "benchmark_workload_dataset": null,
+  "benchmark_workload_examples": null,
+  "evaluation": {
+    "gsm8k_dataset": null,
+    "gsm8k_examples": null,
+    "gsm8k_manifest": null,
+    "domain_dataset": null,
+    "domain_examples": null,
+    "judge_model": null,
+    "judge_prompt_sha256": null,
+    "rubric_template_sha256": null
+  },
+  "hourly_gpu_cost_usd": null,
+  "system": {
+    "platform": null,
+    "python": null,
+    "gpu_name": null
+  },
+  "results": {
+    "fp16_naive": {
+      "load_tests": [
+        {"concurrency": 1, "requests": null, "elapsed_s": null, "output_tokens": null, "throughput_tok_s": null, "ttft_p50_ms": null, "ttft_p95_ms": null, "itl_p50_ms": null, "vram_peak_mb": null, "cost_usd_per_million_tokens": null},
+        {"concurrency": 8, "requests": null, "elapsed_s": null, "output_tokens": null, "throughput_tok_s": null, "ttft_p50_ms": null, "ttft_p95_ms": null, "itl_p50_ms": null, "vram_peak_mb": null, "cost_usd_per_million_tokens": null},
+        {"concurrency": 32, "requests": null, "elapsed_s": null, "output_tokens": null, "throughput_tok_s": null, "ttft_p50_ms": null, "ttft_p95_ms": null, "itl_p50_ms": null, "vram_peak_mb": null, "cost_usd_per_million_tokens": null},
+        {"concurrency": 64, "requests": null, "elapsed_s": null, "output_tokens": null, "throughput_tok_s": null, "ttft_p50_ms": null, "ttft_p95_ms": null, "itl_p50_ms": null, "vram_peak_mb": null, "cost_usd_per_million_tokens": null}
+      ],
+      "quality": {
+        "gsm8k": {"accuracy_exact_match": "pending", "correct": null, "n_samples": null, "samples": [], "delta_vs_baseline_pp": null},
+        "domain": {"accuracy_judge_mean": "pending", "n_samples": null, "delta_vs_baseline": null, "judge_model": null, "judge_prompt_sha256": null, "status": "pending", "requested_samples": null, "by_task_type": {}, "samples": []}
+      }
+    },
+    "fp8_vllm": {
+      "load_tests": [
+        {"concurrency": 1, "requests": null, "elapsed_s": null, "output_tokens": null, "throughput_tok_s": null, "ttft_p50_ms": null, "ttft_p95_ms": null, "itl_p50_ms": null, "vram_peak_mb": null, "cost_usd_per_million_tokens": null},
+        {"concurrency": 8, "requests": null, "elapsed_s": null, "output_tokens": null, "throughput_tok_s": null, "ttft_p50_ms": null, "ttft_p95_ms": null, "itl_p50_ms": null, "vram_peak_mb": null, "cost_usd_per_million_tokens": null},
+        {"concurrency": 32, "requests": null, "elapsed_s": null, "output_tokens": null, "throughput_tok_s": null, "ttft_p50_ms": null, "ttft_p95_ms": null, "itl_p50_ms": null, "vram_peak_mb": null, "cost_usd_per_million_tokens": null},
+        {"concurrency": 64, "requests": null, "elapsed_s": null, "output_tokens": null, "throughput_tok_s": null, "ttft_p50_ms": null, "ttft_p95_ms": null, "itl_p50_ms": null, "vram_peak_mb": null, "cost_usd_per_million_tokens": null}
+      ],
+      "quality": {
+        "gsm8k": {"accuracy_exact_match": "pending", "correct": null, "n_samples": null, "samples": [], "delta_vs_baseline_pp": null},
+        "domain": {"accuracy_judge_mean": "pending", "n_samples": null, "delta_vs_baseline": null, "judge_model": null, "judge_prompt_sha256": null, "status": "pending", "requested_samples": null, "by_task_type": {}, "samples": []}
+      }
+    },
+    "fp8_vllm_router": {
+      "load_tests": [
+        {"concurrency": 1, "requests": null, "elapsed_s": null, "output_tokens": null, "throughput_tok_s": null, "ttft_p50_ms": null, "ttft_p95_ms": null, "itl_p50_ms": null, "vram_peak_mb": null, "cost_usd_per_million_tokens": null},
+        {"concurrency": 8, "requests": null, "elapsed_s": null, "output_tokens": null, "throughput_tok_s": null, "ttft_p50_ms": null, "ttft_p95_ms": null, "itl_p50_ms": null, "vram_peak_mb": null, "cost_usd_per_million_tokens": null},
+        {"concurrency": 32, "requests": null, "elapsed_s": null, "output_tokens": null, "throughput_tok_s": null, "ttft_p50_ms": null, "ttft_p95_ms": null, "itl_p50_ms": null, "vram_peak_mb": null, "cost_usd_per_million_tokens": null},
+        {"concurrency": 64, "requests": null, "elapsed_s": null, "output_tokens": null, "throughput_tok_s": null, "ttft_p50_ms": null, "ttft_p95_ms": null, "itl_p50_ms": null, "vram_peak_mb": null, "cost_usd_per_million_tokens": null}
+      ],
+      "quality": {
+        "gsm8k": {"accuracy_exact_match": "pending", "correct": null, "n_samples": null, "samples": [], "delta_vs_baseline_pp": null},
+        "domain": {"accuracy_judge_mean": "pending", "n_samples": null, "delta_vs_baseline": null, "judge_model": null, "judge_prompt_sha256": null, "status": "pending", "requested_samples": null, "by_task_type": {}, "samples": []}
+      }
+    }
+  }
+}

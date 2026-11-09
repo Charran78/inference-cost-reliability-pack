@@ -1,0 +1,2 @@
+{"id":"EXAMPLE_PII_EMAIL","task_type":"information_extraction","selection_bucket":"high_volume","prompt":"Ejemplo inválido sintético: el contacto de demostración es demo@example.invalid.","expected_output":"Contacto anonimizado.","tags":["example_only"]}
+{"id":"EXAMPLE_PII_PHONE","task_type":"information_extraction","selection_bucket":"high_volume","prompt":"Ejemplo inválido sintético: teléfono ficticio +1 202 555 0143.","expected_output":"Teléfono anonimizado.","tags":["example_only"]}

@@ -16,7 +16,7 @@ ALLOWED_FIELDS = {
     "id", "task_type", "selection_bucket", "prompt", "expected_output",
     "context", "source_ref", "tags",
 }
-EMAIL_RE = re.compile(r"(?<![\w.+-])[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}(?![\w.-])")
+EMAIL_RE = re.compile(r"(?<![\w.+-])[\w.+-]+@(?:[\w-]+\.)+[A-Za-z]{2,}(?![\w-])")
 PHONE_RE = re.compile(
     r"(?<!\w)(?:\+\d{1,3}[ .()-]?)?(?:\(?\d{2,4}\)?[ .-]){2,4}\d{2,4}(?!\w)"
 )

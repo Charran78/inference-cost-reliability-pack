@@ -3,7 +3,16 @@ import re
 import unittest
 from pathlib import Path
 
+from bench.run import create_report_template
 from tools.validate_intake import SELECTION_BUCKETS, TASK_TYPES, detect_pii, validate_schema
+
+
+def key_shape(value):
+    if isinstance(value, dict):
+        return {key: key_shape(child) for key, child in value.items()}
+    if isinstance(value, list):
+        return [key_shape(value[0])] if value else []
+    return None
 
 
 class IntakeValidatorTests(unittest.TestCase):
@@ -73,6 +82,35 @@ class IntakeValidatorTests(unittest.TestCase):
     def test_detects_pii_in_expected_output(self):
         findings = detect_pii([{**self.case, "expected_output": "Call +1 415 555 0134"}])
         self.assertTrue(any("possible PII (phone)" in finding for finding in findings))
+
+    def test_examples_domain_set_is_valid(self):
+        path = Path(__file__).resolve().parents[1] / "examples/domain_set.example.jsonl"
+        records = [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
+        self.assertEqual(len(records), 3)
+        self.assertEqual(validate_schema(records), [])
+        self.assertEqual(detect_pii(records), [])
+
+    def test_examples_pii_invalid_is_rejected(self):
+        path = Path(__file__).resolve().parents[1] / "examples/domain_set.pii_invalid.jsonl"
+        records = [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
+        self.assertEqual(validate_schema(records), [])
+        findings = detect_pii(records)
+        self.assertTrue(any("line 1" in finding and "(email)" in finding for finding in findings))
+        self.assertTrue(any("line 2" in finding and "(phone)" in finding for finding in findings))
+
+    def test_examples_results_schema(self):
+        path = Path(__file__).resolve().parents[1] / "examples/results.example.json"
+        example = json.loads(path.read_text())
+        self.assertTrue(example["_example"])
+        self.assertEqual(example["_note"], "Synthetic schema only; real results are private.")
+        public_report_fields = {key: value for key, value in example.items() if not key.startswith("_")}
+        self.assertEqual(key_shape(public_report_fields), key_shape(create_report_template()))
+        for config in example["results"].values():
+            for measurement in config["load_tests"]:
+                self.assertIsNone(measurement["cost_usd_per_million_tokens"])
+                self.assertIsNone(measurement["ttft_p95_ms"])
+            self.assertEqual(config["quality"]["gsm8k"]["accuracy_exact_match"], "pending")
+            self.assertEqual(config["quality"]["domain"]["accuracy_judge_mean"], "pending")
 
 
 if __name__ == "__main__":

@@ -4,6 +4,14 @@
 
 Responde una pregunta concreta: ¿qué cambia al servir una carga fija con Transformers/PyTorch FP16 frente a vLLM FP8, y qué coste de calidad y latencia añade derivar consultas sencillas a un modelo pequeño? El benchmark guarda las mediciones sin editar en [`results/results.json`](results/results.json) y genera las gráficas desde ese archivo.
 
+## What's in this repo
+
+- [`examples/domain_set.example.jsonl`](examples/domain_set.example.jsonl): tres filas deliberadamente ficticias para ilustrar el formato de intake.
+- [`examples/domain_set.pii_invalid.jsonl`](examples/domain_set.pii_invalid.jsonl): dos fixtures inválidos; uno contiene un email de dominio reservado y otro un teléfono ficticio.
+- [`examples/results.example.json`](examples/results.example.json): forma del informe, con métricas `null`/`pending`; no contiene resultados ni cifras.
+
+Los ejemplos son solo formato. `__pycache__/` y `*.py[cod]` se omiten porque son artefactos generados, no archivos que necesiten fixture.
+
 | Configuración | TTFT p95 | ITL p50 | tok/s @ c=32 | USD/1M tokens de salida | Accuracy (Δ vs. baseline) |
 |---|---:|---:|---:|---:|---:|
 | Llama 3.1 8B, FP16 naive | Pendiente | Pendiente | Pendiente | Pendiente | Pendiente; benchmark pendiente |
