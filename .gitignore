@@ -1,0 +1,6 @@
+__pycache__/
+*.py[cod]
+/private_eval/
+results/*.json
+results/*.png
+!results/.gitkeep

@@ -1,0 +1,115 @@
+services:
+  baseline:
+    profiles: [all]
+    build:
+      context: .
+      dockerfile: serving/Dockerfile.baseline
+    environment:
+      MODEL_ID: meta-llama/Meta-Llama-3.1-8B-Instruct
+      HF_TOKEN: ${HF_TOKEN:-}
+    ports:
+      - "8000:8000"
+    gpus: all
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 20s
+      timeout: 5s
+      retries: 30
+
+  vllm-large:
+    profiles: [all]
+    image: vllm/vllm-openai:v0.8.5
+    command:
+      - --model
+      - meta-llama/Meta-Llama-3.1-8B-Instruct
+      - --served-model-name
+      - large
+      - --quantization
+      - fp8
+      - --max-model-len
+      - "4096"
+      - --gpu-memory-utilization
+      - "0.45"
+    environment:
+      HF_TOKEN: ${HF_TOKEN:-}
+    ports:
+      - "8001:8000"
+    gpus: all
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8000/health || exit 1"]
+      interval: 20s
+      timeout: 5s
+      retries: 30
+
+  vllm-small:
+    profiles: [all]
+    image: vllm/vllm-openai:v0.8.5
+    command:
+      - --model
+      - Qwen/Qwen2.5-3B-Instruct
+      - --served-model-name
+      - small
+      - --quantization
+      - fp8
+      - --max-model-len
+      - "4096"
+      - --gpu-memory-utilization
+      - "0.15"
+    ports:
+      - "8002:8000"
+    gpus: all
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8000/health || exit 1"]
+      interval: 20s
+      timeout: 5s
+      retries: 30
+
+  router:
+    profiles: [all]
+    build:
+      context: .
+      dockerfile: serving/Dockerfile.router
+    environment:
+      LARGE_URL: http://vllm-large:8000
+      SMALL_URL: http://vllm-small:8000
+      LARGE_MODEL: large
+      SMALL_MODEL: small
+      SMALL_MAX_CHARS: ${SMALL_MAX_CHARS:-220}
+    ports:
+      - "8003:8000"
+    depends_on:
+      vllm-large:
+        condition: service_healthy
+      vllm-small:
+        condition: service_healthy
+
+  benchmark:
+    profiles: [all]
+    build:
+      context: .
+      dockerfile: bench/Dockerfile
+    environment:
+      BASELINE_URL: http://baseline:8000
+      FP8_URL: http://vllm-large:8000
+      ROUTER_URL: http://router:8000
+      GPU_HOURLY_USD: ${GPU_HOURLY_USD:-}
+      BENCH_REQUESTS: ${BENCH_REQUESTS:-64}
+      BENCH_MAX_TOKENS: ${BENCH_MAX_TOKENS:-64}
+      QUALITY_MAX_TOKENS: ${QUALITY_MAX_TOKENS:-512}
+      EVAL_CONCURRENCY: ${EVAL_CONCURRENCY:-4}
+      DOMAIN_EVAL_DATASET: /app/private_eval/domain_set.jsonl
+      JUDGE_BASE_URL: ${JUDGE_BASE_URL:-}
+      JUDGE_API_KEY: ${JUDGE_API_KEY:-}
+      JUDGE_MODEL: ${JUDGE_MODEL:-}
+    gpus: all
+    volumes:
+      - ./eval:/app/eval:ro
+      - ./private_eval:/app/private_eval:ro
+      - ./results:/results
+    depends_on:
+      baseline:
+        condition: service_healthy
+      vllm-large:
+        condition: service_healthy
+      router:
+        condition: service_started

@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "One record in eval/gsm8k_200.jsonl",
+  "type": "object",
+  "required": ["id", "source_index", "prompt", "expected"],
+  "properties": {
+    "id": {"type": "string", "pattern": "^gsm8k-test-[0-9]{4}$"},
+    "source_index": {"type": "integer", "minimum": 0},
+    "prompt": {"type": "string", "minLength": 1},
+    "expected": {"type": "string", "pattern": "^-?[0-9]+$"}
+  },
+  "additionalProperties": false
+}

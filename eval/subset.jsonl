@@ -1,0 +1,10 @@
+{"prompt":"What is 17 plus 25? Give the answer clearly.","expected":"42"}
+{"prompt":"A workshop has 8 boxes with 12 bolts in each. How many bolts are there?","expected":"96"}
+{"prompt":"Subtract 38 from 91. State the result.","expected":"53"}
+{"prompt":"A machine makes 14 parts per hour for 6 hours. How many parts does it make?","expected":"84"}
+{"prompt":"What is 144 divided by 12?","expected":"12"}
+{"prompt":"There are 5 shelves with 19 books each. How many books total?","expected":"95"}
+{"prompt":"Add 256 and 179.","expected":"435"}
+{"prompt":"A shipment of 120 units is split equally into 8 crates. How many units per crate?","expected":"15"}
+{"prompt":"A technician checks 7 devices on each of 9 floors. How many devices are checked?","expected":"63"}
+{"prompt":"What is 1000 minus 475?","expected":"525"}
