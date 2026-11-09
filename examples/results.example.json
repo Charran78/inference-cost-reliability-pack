@@ -1,6 +1,6 @@
 {
   "_example": true,
-  "_note": "Synthetic schema only; real results are private.",
+  "_note": "Solo esquema sintético; los resultados reales son privados.",
   "created_at": null,
   "models": {
     "baseline_and_fp8": "meta-llama/Meta-Llama-3.1-8B-Instruct",

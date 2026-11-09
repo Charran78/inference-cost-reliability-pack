@@ -1,0 +1,9 @@
+# Python dependencies shared by local tooling and the service containers.
+# PyTorch/CUDA comes from the pinned PyTorch image; vLLM comes from its pinned image.
+accelerate==1.4.0
+fastapi==0.115.12
+httpx==0.28.1
+matplotlib==3.10.1
+nvidia-ml-py==12.570.86
+transformers==4.49.0
+uvicorn[standard]==0.34.0

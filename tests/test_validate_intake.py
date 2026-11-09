@@ -102,7 +102,7 @@ class IntakeValidatorTests(unittest.TestCase):
         path = Path(__file__).resolve().parents[1] / "examples/results.example.json"
         example = json.loads(path.read_text())
         self.assertTrue(example["_example"])
-        self.assertEqual(example["_note"], "Synthetic schema only; real results are private.")
+        self.assertEqual(example["_note"], "Solo esquema sintético; los resultados reales son privados.")
         public_report_fields = {key: value for key, value in example.items() if not key.startswith("_")}
         self.assertEqual(key_shape(public_report_fields), key_shape(create_report_template()))
         for config in example["results"].values():

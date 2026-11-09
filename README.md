@@ -4,11 +4,13 @@
 
 Responde una pregunta concreta: ¿qué cambia al servir una carga fija con Transformers/PyTorch FP16 frente a vLLM FP8, y qué coste de calidad y latencia añade derivar consultas sencillas a un modelo pequeño? El benchmark guarda las mediciones sin editar en [`results/results.json`](results/results.json) y genera las gráficas desde ese archivo.
 
-## What's in this repo
+## Qué contiene este repositorio
 
 - [`examples/domain_set.example.jsonl`](examples/domain_set.example.jsonl): tres filas deliberadamente ficticias para ilustrar el formato de intake.
 - [`examples/domain_set.pii_invalid.jsonl`](examples/domain_set.pii_invalid.jsonl): dos fixtures inválidos; uno contiene un email de dominio reservado y otro un teléfono ficticio.
 - [`examples/results.example.json`](examples/results.example.json): forma del informe, con métricas `null`/`pending`; no contiene resultados ni cifras.
+- [`H100_RUNBOOK.md`](H100_RUNBOOK.md): pasos y evidencias para la corrida spot, sin presentar mediciones como disponibles.
+- [`OFFER_48H.md`](OFFER_48H.md): borrador de oferta comercial con alcance y límites explícitos.
 
 Los ejemplos son solo formato. `__pycache__/` y `*.py[cod]` se omiten porque son artefactos generados, no archivos que necesiten fixture.
 
@@ -56,7 +58,7 @@ flowchart LR
 
 ## Ejecutar
 
-Requisitos: Linux con NVIDIA Container Toolkit, Docker Compose, GPU compatible con FP8 y acceso aceptado a los pesos de Llama.
+Para tests y herramientas Python locales: `python3 -m pip install -r requirements.txt`. Requisitos para servir modelos: Linux con NVIDIA Container Toolkit, Docker Compose, GPU compatible con FP8 y acceso aceptado a los pesos de Llama. PyTorch/CUDA y vLLM se instalan desde las imágenes Docker fijadas; no se instalan desde el requirements local.
 
 ```bash
 export HF_TOKEN=...                 # token de Hugging Face con acceso a Llama
@@ -74,6 +76,10 @@ make down
 ## Resultados
 
 No se han medido todavía. Tras `make bench`, consulta `results/results.json` local para host y pruebas por concurrencia. El informe puede contener scores y razones del juez derivados de datos contractuales: no se publica ni se comparte fuera del cliente. El coste es `tarifa_horaria × 1.000.000 / (tokens_salida_por_segundo × 3.600)` y excluye el coste del endpoint juez. Registra en esta sección la tarifa spot y su fuente antes de publicar cifras; no compares resultados si cambian GPU, versiones, modelos, carga o precio horario.
+
+## Licencia y atribución
+
+El código de este repositorio se ofrece bajo MIT; consulta [`LICENSE`](LICENSE). El subset GSM8K procede de `openai/grade-school-math`, test split, y conserva su atribución/licencia MIT en [`eval/GSM8K_LICENSE`](eval/GSM8K_LICENSE) y procedencia fijada en el manifiesto. Los pesos de modelos y demás dependencias mantienen sus propias licencias.
 
 ## Limitaciones y siguientes pasos
 
